@@ -1,9 +1,13 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 
+from app.api import auth
 from app.db.session import engine
 
-app = FastAPI(title="Project Zebra")
+app = FastAPI(title="Project Zebra", version="0.1.0")
+
+# Register routers
+app.include_router(auth.router)
 
 
 @app.get("/")
