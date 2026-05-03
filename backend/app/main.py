@@ -1,11 +1,9 @@
 from fastapi import FastAPI
-from sqlalchemy import create_engine, text
-import os
+from sqlalchemy import text
+
+from app.db.session import engine
 
 app = FastAPI(title="Project Zebra")
-
-# Database connection check
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://zebra:zebra_dev_password@localhost:5432/zebra")
 
 
 @app.get("/")
@@ -19,7 +17,6 @@ def health():
     """Health check with database connectivity test."""
     try:
         # Test database connection
-        engine = create_engine(DATABASE_URL)
         with engine.connect() as conn:
             result = conn.execute(text("SELECT 1"))
             result.fetchone()
