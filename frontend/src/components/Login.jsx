@@ -2,15 +2,13 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './Register.css';
 
-export default function Register() {
+export default function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    full_name: ''
+    password: ''
   });
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -28,7 +26,7 @@ export default function Register() {
 
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-      const response = await fetch(`${API_URL}/auth/register`, {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,10 +37,14 @@ export default function Register() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.detail || 'Registration failed');
+        throw new Error(data.detail || 'Login failed');
       }
 
-      setSuccess(true);
+      // Store token in localStorage
+      localStorage.setItem('access_token', data.access_token);
+
+      // Navigate to home
+      navigate('/');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -50,23 +52,10 @@ export default function Register() {
     }
   };
 
-  if (success) {
-    return (
-      <div className="container">
-        <div className="form-card">
-          <div className="success">Account created</div>
-          <button onClick={() => navigate('/login')} style={{ marginTop: '16px' }}>
-            Continue to login →
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="container">
       <div className="form-card">
-        <h1>Create account</h1>
+        <h1>Sign in</h1>
 
         <form onSubmit={handleSubmit}>
           <input
@@ -86,29 +75,18 @@ export default function Register() {
             onChange={handleChange}
             placeholder="Password"
             required
-            minLength={8}
-            disabled={loading}
-          />
-
-          <input
-            type="text"
-            name="full_name"
-            value={formData.full_name}
-            onChange={handleChange}
-            placeholder="Full name"
-            required
             disabled={loading}
           />
 
           {error && <div className="error">{error}</div>}
 
           <button type="submit" disabled={loading}>
-            {loading ? 'Creating...' : 'Create account'}
+            {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
 
         <div className="footer">
-          Already have an account? <Link to="/login" className="link">Sign in</Link>
+          Don't have an account? <Link to="/register" className="link">Sign up</Link>
         </div>
       </div>
     </div>

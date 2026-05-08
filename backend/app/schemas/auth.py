@@ -11,6 +11,20 @@ class UserCreate(BaseModel):
     full_name: str
 
 
+class UserLogin(BaseModel):
+    """Schema for user login."""
+
+    email: EmailStr
+    password: str
+
+
+class Token(BaseModel):
+    """Schema for JWT token response."""
+
+    access_token: str
+    token_type: str
+
+
 class UserResponse(BaseModel):
     """Schema for user responses (no password!)."""
 
