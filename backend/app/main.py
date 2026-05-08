@@ -1,10 +1,23 @@
+import os
+
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from app.api import auth
 from app.db.session import engine
 
 app = FastAPI(title="Project Zebra", version="0.1.0")
+
+# CORS in dev
+if os.getenv("ENVIRONMENT") == "development":
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost:5173"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 # Register routers
 app.include_router(auth.router)

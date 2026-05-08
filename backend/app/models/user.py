@@ -17,7 +17,7 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
 
     # User information
-    full_name = Column(String, nullable=True)
+    full_name = Column(String, nullable=False)
 
     # Timestamps (UTC)
     created_at = Column(

@@ -22,7 +22,8 @@ def test_register_duplicate_email(client):
     """Test that registering with same email twice fails."""
     user_data = {
         "email": "duplicate@example.com",
-        "password": "password123"
+        "password": "password123",
+        "full_name": "Duplicate User"
     }
 
     # First registration should succeed
@@ -41,7 +42,8 @@ def test_register_invalid_email(client):
         "/auth/register",
         json={
             "email": "not-an-email",
-            "password": "password123"
+            "password": "password123",
+            "full_name": "Test User"
         }
     )
 
@@ -54,7 +56,21 @@ def test_register_short_password(client):
         "/auth/register",
         json={
             "email": "test@example.com",
-            "password": "short"
+            "password": "short",
+            "full_name": "Test User"
+        }
+    )
+
+    assert response.status_code == 422  # Validation error
+
+
+def test_register_missing_full_name(client):
+    """Test that missing full_name is rejected."""
+    response = client.post(
+        "/auth/register",
+        json={
+            "email": "test@example.com",
+            "password": "password123"
         }
     )
 
