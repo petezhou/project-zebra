@@ -31,6 +31,7 @@ export default function Login() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Important: receive refresh token cookie
         body: JSON.stringify(formData),
       });
 

@@ -9,19 +9,27 @@ Full-stack authentication system with FastAPI backend, React frontend, and Postg
 ## Architecture
 
 **Backend (FastAPI):**
-- `app/api/` - API route handlers (e.g., auth.py for /auth/register, /auth/login)
-- `app/core/` - Security (password hashing with Argon2, JWT tokens), dependencies (get_db)
+- `app/api/` - API route handlers (e.g., auth.py for /auth/register, /auth/login, /auth/refresh)
+- `app/core/` - Security (password hashing with Argon2, JWT tokens), dependencies (get_db, get_current_user)
 - `app/models/` - SQLAlchemy ORM models (User)
 - `app/schemas/` - Pydantic schemas for request/response validation
 - `app/db/` - Database session management, Base declarative class
 - `alembic/` - Database migrations
 
-**Frontend (React + Vite):**
-- `src/components/` - React components (Register.jsx)
+**Frontend (React + Vite + React Router):**
+- `src/components/` - React components (Login, Register, Home, ProtectedRoute)
+- `src/utils/api.js` - API client with automatic token refresh
 - Vite dev server on port 5173
+- React Router for URL-based navigation (`/`, `/login`, `/register`)
 
 **Key architectural patterns:**
+- **JWT Authentication (sliding window):**
+  - Access token (30 min) in localStorage - sent with every API request
+  - Refresh token (7 days, sliding) in httpOnly cookie - auto-renews on use
+  - Frontend auto-refreshes expired access tokens via `/auth/refresh`
+  - Stateless JWTs - no token storage in database
 - Dependency injection via FastAPI's `Depends(get_db)` for database sessions
+- Protected routes use `get_current_user` dependency to extract user from JWT
 - Pydantic schemas separate from SQLAlchemy models (schemas for validation, models for ORM)
 - Password hashing with Argon2 (not bcrypt)
 - CORS only enabled in development via `ENVIRONMENT=development` env var (production uses reverse proxy)
@@ -104,7 +112,9 @@ docker-compose exec backend alembic revision --autogenerate -m "description"
 All config via environment variables in `.env` (never commit this file):
 - `ENVIRONMENT=development` - Enables CORS for local frontend
 - `DATABASE_URL` - PostgreSQL connection string (postgres:// in Docker, sqlite:// for local tests)
-- `SECRET_KEY` - JWT signing key (generate with `openssl rand -hex 32`)
+- `SECRET_KEY` - JWT signing key (generate with `openssl rand -hex 32`) - REQUIRED, never commit
+- `ACCESS_TOKEN_EXPIRE_MINUTES` - Access token expiry (default: 30)
+- `REFRESH_TOKEN_EXPIRE_DAYS` - Refresh token expiry (default: 7, sliding window)
 
 ## Testing
 

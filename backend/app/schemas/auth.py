@@ -25,6 +25,12 @@ class Token(BaseModel):
     token_type: str
 
 
+class TokenRefresh(BaseModel):
+    """Schema for refresh token request."""
+
+    refresh_token: str
+
+
 class UserResponse(BaseModel):
     """Schema for user responses (no password!)."""
 

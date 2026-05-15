@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiFetch, logout as apiLogout } from '../utils/api';
 import './Register.css';
 
 export default function Home() {
@@ -19,16 +20,11 @@ export default function Home() {
         return;
       }
 
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-      const response = await fetch(`${API_URL}/auth/me`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      // apiFetch automatically refreshes token if expired
+      const response = await apiFetch('/auth/me');
 
       if (!response.ok) {
-        // Token expired or invalid
-        localStorage.removeItem('access_token');
+        // If still failing after refresh attempt, redirect to login
         navigate('/login');
         return;
       }
@@ -43,8 +39,8 @@ export default function Home() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('access_token');
+  const handleLogout = async () => {
+    await apiLogout(); // Clears refresh token cookie on backend
     navigate('/login');
   };
 

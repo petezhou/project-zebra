@@ -9,12 +9,13 @@ from app.db.session import engine
 
 app = FastAPI(title="Project Zebra", version="0.1.0")
 
-# CORS in dev
+# CORS - only needed in development (local frontend on different port)
+# Production uses reverse proxy (same origin, no CORS needed)
 if os.getenv("ENVIRONMENT") == "development":
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["http://localhost:5173"],
-        allow_credentials=True,
+        allow_credentials=True,  # Required for cookies (refresh token)
         allow_methods=["*"],
         allow_headers=["*"],
     )
